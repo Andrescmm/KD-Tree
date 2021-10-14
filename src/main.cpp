@@ -1,3 +1,9 @@
+//
+//  main.cpp
+//  KD-Tree Andres
+//
+//  Created by Andres  on 30/09/21.
+//
 // Copyright
 #include <cstdarg>
 #include <iomanip>
@@ -8,19 +14,22 @@
 #include <vector>
 #include "KDTree.hpp"
 
-#define TEST_BASIC_KD_TREE_ENABLED 0
-#define TEST_MODERATE_KD_TREE_ENABLED 0
-#define TEST_HARDER_KD_TREE_ENABLED 0
-#define TEST_EDGE_CASE_KD_TREE_ENABLED 0
-#define TEST_MUTATING_KD_TREE_ENABLED 0
-#define TEST_THROWING_KD_TREE_ENABLED 0
-#define TEST_CONST_KD_TREE_ENABLED 0
+
+#define TEST_BASIC_KD_TREE_ENABLED 1
+#define TEST_MODERATE_KD_TREE_ENABLED 1
+#define TEST_HARDER_KD_TREE_ENABLED 1
+#define TEST_EDGE_CASE_KD_TREE_ENABLED 1
+#define TEST_MUTATING_KD_TREE_ENABLED 1
+#define TEST_THROWING_KD_TREE_ENABLED 1
+#define TEST_CONST_KD_TREE_ENABLED 1
 
 #define TEST_NEAREST_NEIGHBOR_ENABLED 0
 #define TEST_MORE_NEAREST_NEIGHBOR_ENABLED 0
 
 #define TEST_BASIC_COPY_ENABLED 0
 #define TEST_MODERATE_COPY_ENABLED 0
+
+
 
 template <size_t N, typename IteratorType>
 Point<N> point_from_range(IteratorType begin, IteratorType end) {
@@ -611,6 +620,7 @@ void test_moderate_copy() try {
 }
 
 int main() {
+  std::cout<<"KD-Tree by Andres Cusirramos"<<std::endl;
   test_basic_kd_tree();
   test_moderate_kd_tree();
   test_harder_kd_tree();
@@ -644,3 +654,4 @@ int main() {
 
   press_enter_to_continue();
 }
+
