@@ -1,4 +1,3 @@
-
 //
 //  KDTree.hpp
 //  KD-Tree Andres
@@ -111,18 +110,16 @@ bool KDTree<N, ElemType>::empty() const {
 
 template <size_t N, typename ElemType>
 KDTreeNode<N,ElemType>* niveles(typename vector<pair<Point<N>, ElemType>>::iterator start,typename vector<pair<Point<N>, ElemType>>::iterator end, int currLevel){
-    if (start >= end) return NULL; // empty tree
+    if (start >= end) return NULL;
 
-    int axis = currLevel % N; // the axis to split on
+    int axis = currLevel % N;
     auto cmp = [axis](const std::pair<Point<N>, ElemType>& p1, const std::pair<Point<N>, ElemType>& p2) {
         return p1.first[axis] < p2.first[axis];
     };
     std::size_t len = end - start;
     auto mid = start + len / 2;
-    std::nth_element(start, mid, end, cmp); // linear time partition
+    std::nth_element(start, mid, end, cmp);
 
-    // move left (if needed) so that all the equal points are to the right
-    // The tree will still be balanced as long as there aren't many points that are equal along each axis
     while (mid > start && (mid - 1)->first[axis] == mid->first[axis]) {
         --mid;
     }
@@ -152,7 +149,6 @@ KDTreeNode<N,ElemType>* KDTree<N, ElemType>::busqueda(KDTreeNode<N,ElemType>* te
       }
        level++;
     //}
-    return 0;
 }
 
 
@@ -167,13 +163,13 @@ template <size_t N, typename ElemType>
 void KDTree<N, ElemType>::insert(const Point<N> &pt, const ElemType &value) {
     
     auto targetNode = busqueda(root, pt);
-    if (targetNode == NULL) { // this means the tree is empty
+    if (targetNode == NULL) {
         root = new KDTreeNode<N,ElemType>(pt, 0, value);
         size_ = 1;
     } else {
-        if (targetNode->p == pt) { // pt is already in the tree, simply update its value
+        if (targetNode->p == pt) {
             targetNode->value = value;
-        } else { // construct a new node and insert it to the right place (child of targetNode)
+        } else {
             int currLevel = targetNode->level;
             KDTreeNode<N,ElemType>* newNode = new KDTreeNode<N,ElemType>(pt, currLevel + 1, value);
             if (pt[currLevel%N] < targetNode->p[currLevel%N]) {
@@ -190,11 +186,11 @@ void KDTree<N, ElemType>::insert(const Point<N> &pt, const ElemType &value) {
 template <size_t N, typename ElemType>
 ElemType &KDTree<N, ElemType>::operator[](const Point<N> &pt) {
     auto node = busqueda(root, pt);
-    if (node != NULL && node->p == pt) { // pt is already in the tree
+    if (node != NULL && node->p == pt) { // Si pt estuviera en el arbol
         return node->value;
-    } else { // insert pt with default ElemType value, and return reference to the new ElemType
+    } else { 
         insert(pt);
-        if (node == NULL) return root->value; // the new node is the root
+        if (node == NULL) return root->value;
         else return (node->leftNode != NULL && node->leftNode->p == pt) ? node->leftNode->value: node->rightNode->value;
     }
 }
