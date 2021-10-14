@@ -37,7 +37,6 @@ class KDTree {
   bool contains(const Point<N> &pt) const;
   void insert(const Point<N> &pt, const ElemType &value=ElemType());
   KDTreeNode<N,ElemType>* busqueda( KDTreeNode<N,ElemType>* temp,const Point<N>& pt) const;
-  KDTreeNode<N,ElemType>* niveles(typename vector<pair<Point<N>, ElemType>>::iterator start,typename vector<pair<Point<N>, ElemType>>::iterator end, int currLevel);
   ElemType &operator[](const Point<N> &pt);// valor del punto
   ElemType &at(const Point<N> &pt); // parecido al de arriba
   const ElemType &at(const Point<N> &pt) const; // cuando el KD-tree es de tipo constante llamara a la funcioarriba
@@ -108,27 +107,6 @@ bool KDTree<N, ElemType>::empty() const {
   return false;
 }
 
-template <size_t N, typename ElemType>
-KDTreeNode<N,ElemType>* niveles(typename vector<pair<Point<N>, ElemType>>::iterator start,typename vector<pair<Point<N>, ElemType>>::iterator end, int currLevel){
-    if (start >= end) return NULL;
-
-    int axis = currLevel % N;
-    auto cmp = [axis](const std::pair<Point<N>, ElemType>& p1, const std::pair<Point<N>, ElemType>& p2) {
-        return p1.first[axis] < p2.first[axis];
-    };
-    std::size_t len = end - start;
-    auto mid = start + len / 2;
-    std::nth_element(start, mid, end, cmp);
-
-    while (mid > start && (mid - 1)->first[axis] == mid->first[axis]) {
-        --mid;
-    }
-
-    KDTreeNode<N,ElemType>* newNode = new KDTreeNode<N,ElemType>(mid->first, currLevel, mid->second);
-    newNode->left = buildTree(start, mid, currLevel + 1);
-    newNode->right = buildTree(mid + 1, end, currLevel + 1);
-    return newNode;
-}
 
 //Busqueda
 template <size_t N, typename ElemType>
@@ -151,57 +129,54 @@ KDTreeNode<N,ElemType>* KDTree<N, ElemType>::busqueda(KDTreeNode<N,ElemType>* te
     //}
 }
 
-
-
 template <size_t N, typename ElemType>
 bool KDTree<N, ElemType>::contains(const Point<N> &pt) const {
-    auto node = busqueda(root, pt);
-    return node != NULL && node->p == pt;
+    auto bus = busqueda(root, pt);
+    return bus != NULL && bus->p == pt;
 }
 
 template <size_t N, typename ElemType>
 void KDTree<N, ElemType>::insert(const Point<N> &pt, const ElemType &value) {
     
-    auto targetNode = busqueda(root, pt);
-    if (targetNode == NULL) {
+    auto insert = busqueda(root, pt);
+    if (insert == NULL) {
         root = new KDTreeNode<N,ElemType>(pt, 0, value);
         size_ = 1;
-    } else {
-        if (targetNode->p == pt) {
-            targetNode->value = value;
-        } else {
-            int currLevel = targetNode->level;
-            KDTreeNode<N,ElemType>* newNode = new KDTreeNode<N,ElemType>(pt, currLevel + 1, value);
-            if (pt[currLevel%N] < targetNode->p[currLevel%N]) {
-                targetNode->leftNode = newNode;
-            } else {
-                targetNode->rightNode = newNode;
+      }
+    else {
+        if (insert->p == pt) insert->value = value;
+        else {
+            int level = insert->level;
+            KDTreeNode<N,ElemType>* newNode = new KDTreeNode<N,ElemType>(pt, level + 1, value);
+            if (pt[level % N] < insert->p[level % N]) insert->leftNode = newNode;
+            else {
+                insert->rightNode = newNode;
             }
-            ++size_;
+            size_++;
         }
     }
 }
 
-
+// Operator []
 template <size_t N, typename ElemType>
 ElemType &KDTree<N, ElemType>::operator[](const Point<N> &pt) {
-    auto node = busqueda(root, pt);
-    if (node != NULL && node->p == pt) { // Si pt estuviera en el arbol
-        return node->value;
-    } else { 
+    auto op = busqueda(root, pt);
+    if (op != NULL && op->p == pt) return op->value;
+    else {
         insert(pt);
-        if (node == NULL) return root->value;
-        else return (node->leftNode != NULL && node->leftNode->p == pt) ? node->leftNode->value: node->rightNode->value;
+        if (op == NULL) return root->value;
+        else return (op->leftNode != NULL && op->leftNode->p == pt) ? op->leftNode->value: op->rightNode->value;
     }
 }
 
+/// AT
 template <size_t N, typename ElemType>
 ElemType &KDTree<N, ElemType>::at(const Point<N> &pt) {
     const KDTree<N, ElemType>& constThis = *this;
     return const_cast<ElemType&>(constThis.at(pt));
 }
 
-
+/// const AT
 template <size_t N, typename ElemType>
 const ElemType &KDTree<N, ElemType>::at(const Point<N> &pt) const {
     auto node = busqueda(root, pt);
