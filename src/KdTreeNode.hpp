@@ -19,6 +19,8 @@ class KDTreeNode {
     Point<N> p;
     KDTreeNode();
     KDTreeNode(value_type &value,int _level);
+    KDTreeNode(const Point<N>& _pt, int _level, const ElemType& _value=ElemType()):
+        p(_pt), leftNode(NULL), rightNode(NULL), level(_level), value(_value) {}
     
    
 };
@@ -29,13 +31,3 @@ KDTreeNode<N, ElemType>::KDTreeNode() {
   rightNode=nullptr;
   this-> level = level;
 }
-
-template <size_t N, typename ElemType>
-KDTreeNode<N, ElemType>::KDTreeNode(value_type &value,int _level){
-  this->leftNode=nullptr;
-  this->rightNode=nullptr;
-  this->value=value.second;
-  this->level=_level;
-  p=value.first;
-}
-
